@@ -1,0 +1,29 @@
+{
+  "appId": "com.gaming.racing3d",
+  "productName": "3D Racing Game",
+  "directories": {
+    "output": "dist-electron"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/main.js",
+    "package.json"
+  ],
+  "win": {
+    "target": "nsis",
+    "icon": "electron/icon.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  },
+  "extraResources": [
+    {
+      "from": "dist/public",
+      "to": "app",
+      "filter": ["**/*"]
+    }
+  ]
+}

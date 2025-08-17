@@ -242,7 +242,7 @@ if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../dist/public/index.html'));
   });
-file link from which i can install the app} else {
+} else {
   app.use(express.static(path.join(__dirname, '../client')));
 
   app.get('*', (req, res) => {
