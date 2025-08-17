@@ -60,7 +60,7 @@ export default function MainMenu() {
       <div className="relative z-10 w-full max-w-6xl">
         <div className="text-center mb-12">
           <h1 className="text-6xl font-bold neon-text mb-4">
-            GAMEHUB
+            RACEREALM
           </h1>
           <p className="text-xl text-muted-foreground">
             Professional Racing Experience
