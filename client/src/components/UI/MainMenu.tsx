@@ -35,6 +35,10 @@ export default function MainMenu() {
   }, [initializeAudio]);
 
   const startGame = () => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
     setPhase('loading');
     setLocation('/game');
   };
@@ -44,7 +48,7 @@ export default function MainMenu() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/10 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/10 flex items-center justify-center p-4 scrollable">
       <div className="absolute inset-0 bg-[url('/images/city-bg.jpg')] bg-cover bg-center opacity-20" />
       
       <div className="relative z-10 w-full max-w-6xl">
@@ -110,7 +114,13 @@ export default function MainMenu() {
                 Race against players from around the world
               </p>
               <Button 
-                onClick={() => setLocation('/multiplayer')}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    setShowAuthModal(true);
+                    return;
+                  }
+                  setLocation('/multiplayer');
+                }}
                 className="cyber-button w-full"
                 size="lg"
               >
@@ -131,7 +141,13 @@ export default function MainMenu() {
                 Progress through championships and unlock rewards
               </p>
               <Button 
-                onClick={() => setLocation('/career')}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    setShowAuthModal(true);
+                    return;
+                  }
+                  setLocation('/career');
+                }}
                 className="cyber-button w-full"
                 size="lg"
               >
@@ -152,7 +168,13 @@ export default function MainMenu() {
                 Customize and upgrade your vehicles
               </p>
               <Button 
-                onClick={() => setLocation('/garage')}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    setShowAuthModal(true);
+                    return;
+                  }
+                  setLocation('/garage');
+                }}
                 className="cyber-button w-full"
                 size="lg"
               >
@@ -194,7 +216,13 @@ export default function MainMenu() {
                 Purchase cars, upgrades, and cosmetics
               </p>
               <Button 
-                onClick={() => setLocation('/shop')}
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    setShowAuthModal(true);
+                    return;
+                  }
+                  setLocation('/shop');
+                }}
                 className="cyber-button w-full"
                 size="lg"
               >
