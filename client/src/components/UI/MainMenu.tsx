@@ -1,18 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { Play, Settings, Trophy, Car, Coins, Users } from 'lucide-react';
+import { Play, Settings, Trophy, Car, Coins, Users, LogOut, User } from 'lucide-react';
 import { useGame } from '../../stores/useGame';
 import { usePayment } from '../../stores/usePayment';
 import { useAudio } from '../../stores/useAudio';
+import { useAuth } from '../../stores/useAuth';
+import AuthModal from './AuthModal';
 
 export default function MainMenu() {
   const [, setLocation] = useLocation();
   const { setPhase } = useGame();
   const { coins } = usePayment();
   const { initializeAudio, playBackgroundMusic } = useAudio();
+  const { user, isAuthenticated, logout } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     const handleUserInteraction = async () => {
@@ -51,9 +55,24 @@ export default function MainMenu() {
           <p className="text-xl text-muted-foreground">
             Professional Racing Experience
           </p>
-          <div className="flex items-center justify-center gap-2 mt-4">
-            <Coins className="w-5 h-5 text-primary" />
-            <span className="text-lg font-semibold">{coins.toLocaleString()}</span>
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <div className="flex items-center gap-2">
+              <Coins className="w-5 h-5 text-primary" />
+              <span className="text-lg font-semibold">{coins.toLocaleString()}</span>
+            </div>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4 text-primary" />
+                <span className="text-sm">{user?.username}</span>
+                <Button variant="ghost" size="sm" onClick={logout}>
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => setShowAuthModal(true)}>
+                Login
+              </Button>
+            )}
           </div>
         </div>
 
@@ -191,6 +210,11 @@ export default function MainMenu() {
           </p>
         </div>
       </div>
+      
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+      />
     </div>
   );
 }

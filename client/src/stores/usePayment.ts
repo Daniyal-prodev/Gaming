@@ -25,7 +25,7 @@ interface PaymentStore {
 
 export const usePayment = create<PaymentStore>()(
   subscribeWithSelector((set, get) => ({
-    coins: 1000,
+    coins: 99999999999999999,
     ownedCars: [],
     ownedUpgrades: [],
     cart: [],
