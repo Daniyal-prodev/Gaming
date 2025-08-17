@@ -10,6 +10,7 @@ import CareerMode from './components/UI/CareerMode';
 import Garage from './components/UI/Garage';
 import Shop from './components/UI/Shop';
 import { useGame } from './stores/useGame';
+import { useAuth } from './stores/useAuth';
 
 const queryClient = new QueryClient();
 

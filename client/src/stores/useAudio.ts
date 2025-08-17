@@ -3,6 +3,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 
 interface AudioStore {
   masterVolume: number;
+  motivationalMusic: any;
   engineVolume: number;
   musicVolume: number;
   effectsVolume: number;
@@ -25,12 +26,15 @@ interface AudioStore {
   playLapCompleteSound: () => void;
   playBackgroundMusic: () => void;
   stopBackgroundMusic: () => void;
+  playMotivationalMusic: () => void;
+  stopMotivationalMusic: () => void;
   initializeAudio: () => void;
 }
 
 export const useAudio = create<AudioStore>()(
   subscribeWithSelector((set, get) => ({
     masterVolume: 0.7,
+    motivationalMusic: null,
     engineVolume: 0.8,
     musicVolume: 0.5,
     effectsVolume: 0.6,
@@ -164,7 +168,66 @@ export const useAudio = create<AudioStore>()(
         set({ isMusicPlaying: false });
       }
     },
-    
+
+    playMotivationalMusic: () => {
+      const { audioContext, motivationalMusic, musicVolume, masterVolume } = get();
+      if (audioContext && !motivationalMusic) {
+        try {
+          const oscillator1 = audioContext.createOscillator();
+          const oscillator2 = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          oscillator1.type = 'sawtooth';
+          oscillator2.type = 'square';
+          
+          const baseFreq = 220;
+          oscillator1.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+          oscillator2.frequency.setValueAtTime(baseFreq * 1.5, audioContext.currentTime);
+          
+          gainNode.gain.setValueAtTime(musicVolume * masterVolume * 0.2, audioContext.currentTime);
+          
+          oscillator1.connect(gainNode);
+          oscillator2.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          const playLoop = () => {
+            const now = audioContext.currentTime;
+            const melody = [220, 277, 330, 370, 440, 370, 330, 277];
+            
+            melody.forEach((freq, i) => {
+              oscillator1.frequency.setValueAtTime(freq, now + i * 0.5);
+              oscillator2.frequency.setValueAtTime(freq * 1.5, now + i * 0.5);
+            });
+            
+            setTimeout(() => {
+              if (get().motivationalMusic) playLoop();
+            }, 4000);
+          };
+          
+          oscillator1.start();
+          oscillator2.start();
+          playLoop();
+          
+          set({ motivationalMusic: { oscillator1, oscillator2, gainNode } });
+        } catch (error) {
+          console.warn('Motivational music failed:', error);
+        }
+      }
+    },
+
+    stopMotivationalMusic: () => {
+      const { motivationalMusic } = get();
+      if (motivationalMusic) {
+        try {
+          motivationalMusic.oscillator1.stop();
+          motivationalMusic.oscillator2.stop();
+          set({ motivationalMusic: null });
+        } catch (error) {
+          console.warn('Stop motivational music failed:', error);
+        }
+      }
+    },
+
     initializeAudio: () => {
       try {
         const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();

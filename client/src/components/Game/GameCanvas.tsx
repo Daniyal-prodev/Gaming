@@ -2,13 +2,15 @@ import React, { Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { KeyboardControls, Environment, Stats } from '@react-three/drei';
 import { useLocation } from 'wouter';
-import Car from './Car';
-import Track from './Track';
+import RealisticTrack from './RealisticTrack';
+import EnhancedCar from './EnhancedCar';
 import Camera from './Camera';
+import HD4DEffects from './HD4DEffects';
 import GameHUD from '../UI/GameHUD';
 import LoadingScreen from '../UI/LoadingScreen';
 import { useGame } from '../../stores/useGame';
 import { useSettings } from '../../stores/useSettings';
+import { useAudio } from '../../stores/useAudio';
 
 const keyboardMap = [
   { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
@@ -23,9 +25,11 @@ export default function GameCanvas() {
   const [, setLocation] = useLocation();
   const { phase, setPhase } = useGame();
   const { graphics } = useSettings();
+  const { playMotivationalMusic, initializeAudio } = useAudio();
 
   useEffect(() => {
     setPhase('racing');
+    initializeAudio();
     
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -33,9 +37,17 @@ export default function GameCanvas() {
       }
     };
 
+    const handleClick = () => {
+      playMotivationalMusic();
+    };
+
     window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [setPhase, setLocation]);
+    window.addEventListener('click', handleClick);
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+      window.removeEventListener('click', handleClick);
+    };
+  }, [setPhase, setLocation, initializeAudio, playMotivationalMusic]);
 
   if (phase === 'loading') {
     return <LoadingScreen />;
@@ -55,20 +67,37 @@ export default function GameCanvas() {
           <Suspense fallback={null}>
             <Environment preset="night" />
             
-            <ambientLight intensity={0.3} />
+            <ambientLight intensity={0.4} color="#4488ff" />
             <directionalLight
-              position={[10, 10, 5]}
-              intensity={1}
+              position={[20, 20, 10]}
+              intensity={1.5}
+              color="#ffffff"
               castShadow={graphics.shadows}
-              shadow-mapSize-width={2048}
-              shadow-mapSize-height={2048}
+              shadow-mapSize-width={4096}
+              shadow-mapSize-height={4096}
+              shadow-camera-near={0.1}
+              shadow-camera-far={100}
+              shadow-camera-left={-50}
+              shadow-camera-right={50}
+              shadow-camera-top={50}
+              shadow-camera-bottom={-50}
+            />
+            <hemisphereLight
+              args={["#87ceeb", "#362d1d", 0.6]}
+            />
+            <pointLight
+              position={[0, 15, 0]}
+              intensity={2}
+              color="#00ffff"
+              distance={50}
             />
             
-            <fog attach="fog" args={['#0a0a0a', 50, 200]} />
+            <fog attach="fog" args={['#1a2a3a', 80, 300]} />
 
-            <Track />
-            <Car />
+            <RealisticTrack />
+            <EnhancedCar />
             <Camera />
+            <HD4DEffects carPosition={[0, 0, 0]} carSpeed={0} />
             
             {process.env.NODE_ENV === 'development' && <Stats />}
           </Suspense>

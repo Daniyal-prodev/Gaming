@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
+  "main": "electron/main.js",
+  "description": "HD 4D Racing Game with futuristic cars and immersive 3D experience",
+  "author": {
+    "name": "Daniyal-prodev",
+    "email": "daniyalkb903@gmail.com"
+  },
   "scripts": {
     "dev": "concurrently \"vite --port 5173\" \"tsx server/index.ts\"",
     "dev:client": "vite --port 5173",
@@ -13,6 +19,8 @@
     "electron": "electron electron/main.js",
     "electron:build": "npm run build && electron-builder",
     "dist": "npm run build && electron-builder --publish=never",
+    "build:standalone": "node build-standalone.js",
+    "package": "npm run build && electron-builder --publish=never",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
@@ -132,5 +140,65 @@
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
+  },
+  "build": {
+    "appId": "com.racing.game.hd4d",
+    "productName": "HD 4D Racing Game",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/main.js",
+      "client/dist/**/*",
+      "server/dist/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "client/public",
+        "to": "public"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64", "ia32"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "client/public/favicon.ico"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "client/public/favicon.ico"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "client/public/favicon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   }
 }
