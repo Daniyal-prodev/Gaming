@@ -5,12 +5,16 @@ import { Toaster } from 'sonner';
 import MainMenu from './components/UI/MainMenu';
 import GameCanvas from './components/Game/GameCanvas';
 import SettingsPanel from './components/UI/SettingsPanel';
+import MultiplayerLobby from './components/UI/MultiplayerLobby';
+import CareerMode from './components/UI/CareerMode';
+import Garage from './components/UI/Garage';
+import Shop from './components/UI/Shop';
 import { useGame } from './stores/useGame';
 
 const queryClient = new QueryClient();
 
 function App() {
-  const { gamePhase } = useGame();
+  const { phase } = useGame();
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -22,6 +26,18 @@ function App() {
             </Route>
             <Route path="/settings">
               <SettingsPanel />
+            </Route>
+            <Route path="/multiplayer">
+              <MultiplayerLobby />
+            </Route>
+            <Route path="/career">
+              <CareerMode />
+            </Route>
+            <Route path="/garage">
+              <Garage />
+            </Route>
+            <Route path="/shop">
+              <Shop />
             </Route>
             <Route>
               <MainMenu />

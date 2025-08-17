@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import type { PaymentIntent, PurchaseItem, Car, CarUpgrade } from '../../../shared/types';
+import type { PaymentIntent, PurchaseItem, Car, CarUpgrade } from '../types';
 
 interface PaymentStore {
   coins: number;
@@ -16,6 +16,8 @@ interface PaymentStore {
   clearCart: () => void;
   purchaseWithCoins: (items: PurchaseItem[]) => Promise<boolean>;
   purchaseWithStripe: (items: PurchaseItem[]) => Promise<PaymentIntent>;
+  purchaseItem: (items: PurchaseItem[]) => Promise<void>;
+  createPaymentIntent: (items: PurchaseItem[]) => Promise<PaymentIntent>;
   buyCar: (car: Car) => Promise<boolean>;
   buyUpgrade: (upgrade: CarUpgrade) => Promise<boolean>;
   buyCoins: (amount: number) => Promise<PaymentIntent>;
@@ -23,7 +25,7 @@ interface PaymentStore {
 
 export const usePayment = create<PaymentStore>()(
   subscribeWithSelector((set, get) => ({
-    coins: 1000,
+    coins: 99999999999999999,
     ownedCars: [],
     ownedUpgrades: [],
     cart: [],
@@ -104,6 +106,19 @@ export const usePayment = create<PaymentStore>()(
       }]);
     },
     
+    purchaseItem: async (items: PurchaseItem[]) => {
+      const totalCost = items.reduce((sum, item) => sum + item.price, 0);
+      const success = get().spendCoins(totalCost);
+      
+      if (!success) {
+        throw new Error('Insufficient coins');
+      }
+    },
+    
+    createPaymentIntent: async (items: PurchaseItem[]): Promise<PaymentIntent> => {
+      return get().purchaseWithStripe(items);
+    },
+
     buyCoins: async (amount) => {
       const pricePerCoin = 0.01;
       return get().purchaseWithStripe([{

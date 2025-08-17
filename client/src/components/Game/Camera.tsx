@@ -25,24 +25,26 @@ export default function Camera() {
     
     switch (cameraMode.current) {
       case 0:
-        const behindOffset = new THREE.Vector3(0, 3, 8);
+        const behindOffset = new THREE.Vector3(0, 4, 10);
         behindOffset.applyEuler(carRot);
-        camera.position.lerp(carPos.clone().add(behindOffset), 0.1);
-        camera.lookAt(carPos);
+        camera.position.lerp(carPos.clone().add(behindOffset), 0.08);
+        
+        const lookTarget = carPos.clone().add(new THREE.Vector3(0, 1, 0));
+        camera.lookAt(lookTarget);
         break;
         
       case 1:
-        const topOffset = new THREE.Vector3(0, 15, 0);
-        camera.position.lerp(carPos.clone().add(topOffset), 0.1);
+        const topOffset = new THREE.Vector3(0, 20, 5);
+        camera.position.lerp(carPos.clone().add(topOffset), 0.06);
         camera.lookAt(carPos);
         break;
         
       case 2:
-        const frontOffset = new THREE.Vector3(0, 1, 2);
-        frontOffset.applyEuler(carRot);
-        camera.position.lerp(carPos.clone().add(frontOffset), 0.1);
+        const cockpitOffset = new THREE.Vector3(0, 1.2, 1);
+        cockpitOffset.applyEuler(carRot);
+        camera.position.lerp(carPos.clone().add(cockpitOffset), 0.12);
         
-        const lookAhead = new THREE.Vector3(0, 0, -10);
+        const lookAhead = new THREE.Vector3(0, 0, -15);
         lookAhead.applyEuler(carRot);
         camera.lookAt(carPos.clone().add(lookAhead));
         break;

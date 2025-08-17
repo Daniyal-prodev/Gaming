@@ -7,8 +7,13 @@ interface AudioStore {
   musicVolume: number;
   effectsVolume: number;
   muted: boolean;
-  engineSound: HTMLAudioElement | null;
-  musicTrack: HTMLAudioElement | null;
+  audioContext: AudioContext | null;
+  engineOscillator: OscillatorNode | null;
+  engineGain: GainNode | null;
+  musicOscillator: OscillatorNode | null;
+  musicGain: GainNode | null;
+  isEngineRunning: boolean;
+  isMusicPlaying: boolean;
   
   setMasterVolume: (volume: number) => void;
   setEngineVolume: (volume: number) => void;
@@ -30,8 +35,13 @@ export const useAudio = create<AudioStore>()(
     musicVolume: 0.5,
     effectsVolume: 0.6,
     muted: false,
-    engineSound: null,
-    musicTrack: null,
+    audioContext: null,
+    engineOscillator: null,
+    engineGain: null,
+    musicOscillator: null,
+    musicGain: null,
+    isEngineRunning: false,
+    isMusicPlaying: false,
     
     setMasterVolume: (volume) => set({ masterVolume: volume }),
     
@@ -44,59 +54,159 @@ export const useAudio = create<AudioStore>()(
     toggleMute: () => set((state) => ({ muted: !state.muted })),
     
     playEngineSound: (rpm) => {
-      const { engineSound, engineVolume, masterVolume, muted } = get();
-      if (engineSound && !muted) {
-        engineSound.volume = (engineVolume * masterVolume) * Math.min(rpm / 6000, 1);
-        engineSound.playbackRate = 0.5 + (rpm / 8000);
-        if (engineSound.paused) {
-          engineSound.play().catch(() => {});
+      const { audioContext, engineOscillator, engineGain, engineVolume, masterVolume, muted, isEngineRunning } = get();
+      
+      if (!audioContext || muted) return;
+      
+      try {
+        if (!isEngineRunning && engineOscillator && engineGain) {
+          const frequency = 80 + (rpm / 8000) * 400;
+          engineOscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+          
+          const volume = (engineVolume * masterVolume) * Math.min(rpm / 6000, 1) * 0.3;
+          engineGain.gain.setValueAtTime(volume, audioContext.currentTime);
+          
+          if (audioContext.state === 'suspended') {
+            audioContext.resume();
+          }
+          
+          set({ isEngineRunning: true });
+        } else if (isEngineRunning && engineOscillator && engineGain) {
+          const frequency = 80 + (rpm / 8000) * 400;
+          engineOscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+          
+          const volume = (engineVolume * masterVolume) * Math.min(rpm / 6000, 1) * 0.3;
+          engineGain.gain.setValueAtTime(volume, audioContext.currentTime);
         }
+      } catch (error) {
+        console.warn('Audio playback failed:', error);
       }
     },
     
     playCollisionSound: () => {
-      const { effectsVolume, masterVolume, muted } = get();
-      if (!muted) {
-        const audio = new Audio('/sounds/collision.mp3');
-        audio.volume = effectsVolume * masterVolume;
-        audio.play().catch(() => {});
+      const { audioContext, effectsVolume, masterVolume, muted } = get();
+      if (!audioContext || muted) return;
+      
+      try {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.3);
+        
+        const volume = effectsVolume * masterVolume * 0.5;
+        gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+      } catch (error) {
+        console.warn('Collision sound failed:', error);
       }
     },
     
     playLapCompleteSound: () => {
-      const { effectsVolume, masterVolume, muted } = get();
-      if (!muted) {
-        const audio = new Audio('/sounds/lap-complete.mp3');
-        audio.volume = effectsVolume * masterVolume;
-        audio.play().catch(() => {});
+      const { audioContext, effectsVolume, masterVolume, muted } = get();
+      if (!audioContext || muted) return;
+      
+      try {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(554, audioContext.currentTime + 0.2);
+        oscillator.frequency.setValueAtTime(659, audioContext.currentTime + 0.4);
+        
+        const volume = effectsVolume * masterVolume * 0.4;
+        gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.6);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.6);
+      } catch (error) {
+        console.warn('Lap complete sound failed:', error);
       }
     },
     
     playBackgroundMusic: () => {
-      const { musicTrack, musicVolume, masterVolume, muted } = get();
-      if (musicTrack && !muted) {
-        musicTrack.volume = musicVolume * masterVolume;
-        musicTrack.loop = true;
-        musicTrack.play().catch(() => {});
+      const { audioContext, musicOscillator, musicGain, musicVolume, masterVolume, muted, isMusicPlaying } = get();
+      
+      if (!audioContext || muted || isMusicPlaying) return;
+      
+      try {
+        if (musicOscillator && musicGain) {
+          const volume = musicVolume * masterVolume * 0.1;
+          musicGain.gain.setValueAtTime(volume, audioContext.currentTime);
+          
+          if (audioContext.state === 'suspended') {
+            audioContext.resume();
+          }
+          
+          set({ isMusicPlaying: true });
+        }
+      } catch (error) {
+        console.warn('Background music failed:', error);
       }
     },
     
     stopBackgroundMusic: () => {
-      const { musicTrack } = get();
-      if (musicTrack) {
-        musicTrack.pause();
-        musicTrack.currentTime = 0;
+      const { musicGain, audioContext } = get();
+      if (musicGain && audioContext) {
+        musicGain.gain.setValueAtTime(0, audioContext.currentTime);
+        set({ isMusicPlaying: false });
       }
     },
     
     initializeAudio: () => {
-      const engineSound = new Audio('/sounds/engine.mp3');
-      const musicTrack = new Audio('/sounds/background-music.mp3');
-      
-      engineSound.loop = true;
-      musicTrack.loop = true;
-      
-      set({ engineSound, musicTrack });
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        
+        const engineOscillator = audioContext.createOscillator();
+        const engineGain = audioContext.createGain();
+        const engineFilter = audioContext.createBiquadFilter();
+        
+        engineOscillator.type = 'sawtooth';
+        engineOscillator.frequency.setValueAtTime(80, audioContext.currentTime);
+        engineFilter.type = 'lowpass';
+        engineFilter.frequency.setValueAtTime(800, audioContext.currentTime);
+        
+        engineOscillator.connect(engineFilter);
+        engineFilter.connect(engineGain);
+        engineGain.connect(audioContext.destination);
+        
+        engineGain.gain.setValueAtTime(0, audioContext.currentTime);
+        engineOscillator.start();
+        
+        const musicOscillator = audioContext.createOscillator();
+        const musicGain = audioContext.createGain();
+        
+        musicOscillator.type = 'sine';
+        musicOscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+        
+        musicOscillator.connect(musicGain);
+        musicGain.connect(audioContext.destination);
+        
+        musicGain.gain.setValueAtTime(0, audioContext.currentTime);
+        musicOscillator.start();
+        
+        set({ 
+          audioContext, 
+          engineOscillator, 
+          engineGain,
+          musicOscillator,
+          musicGain
+        });
+      } catch (error) {
+        console.warn('Audio initialization failed:', error);
+      }
     },
   }))
 );
