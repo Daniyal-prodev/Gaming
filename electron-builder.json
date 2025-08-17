@@ -1,6 +1,6 @@
 {
-  "appId": "com.gaming.racing3d",
-  "productName": "GameHub Racing",
+  "appId": "com.racerealm.game",
+  "productName": "RaceRealm",
   "directories": {
     "output": "dist-electron"
   },
