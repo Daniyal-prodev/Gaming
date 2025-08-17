@@ -60,10 +60,16 @@ export default function MainMenu() {
             Professional Racing Experience
           </p>
           <div className="flex items-center justify-center gap-4 mt-4">
-            <div className="flex items-center gap-2">
-              <Coins className="w-5 h-5 text-primary" />
-              <span className="text-lg font-semibold">{coins.toLocaleString()}</span>
-            </div>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <Coins className="w-5 h-5 text-primary" />
+                <span className="text-lg font-semibold">{coins.toLocaleString()}</span>
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                Login to view coins
+              </div>
+            )}
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-primary" />

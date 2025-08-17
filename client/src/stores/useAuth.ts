@@ -34,11 +34,13 @@ export const useAuth = create<AuthStore>()(
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
           
+          const coins = email === 'aribdaniyal88@gmail.com' ? 10000000000 : 1000;
+          
           const user: User = {
             id: '1',
             username: email.split('@')[0],
             email,
-            coins: 1000,
+            coins,
             createdAt: new Date().toISOString(),
           };
           
