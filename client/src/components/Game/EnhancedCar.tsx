@@ -39,11 +39,11 @@ export default function EnhancedCar() {
       engineSoundPlaying.current = false;
     }
 
-    const maxSpeed = 0.8;
-    const acceleration = 0.02;
-    const brakeForce = 0.04;
-    const friction = 0.98;
-    const turnSpeed = 0.03;
+    const maxSpeed = 1.2;
+    const acceleration = 0.035;
+    const brakeForce = 0.06;
+    const friction = 0.985;
+    const turnSpeed = 0.035;
 
     if (engineValue !== 0) {
       const force = engineValue * acceleration;
@@ -65,8 +65,9 @@ export default function EnhancedCar() {
       velocity.current[2] = (velocity.current[2] / speed) * maxSpeed;
     }
 
-    if (steerValue !== 0 && Math.abs(engineValue) > 0) {
-      rotation.current[1] += steerValue * turnSpeed * Math.min(speed / 0.3, 1);
+    if (steerValue !== 0) {
+      const steerFactor = Math.max(0.3, Math.min(speed / 0.3, 1));
+      rotation.current[1] += steerValue * turnSpeed * steerFactor;
     }
 
     const carX = position.current[0];
