@@ -142,8 +142,8 @@
     "bufferutil": "^4.0.8"
   },
   "build": {
-    "appId": "com.racing.game.hd4d",
-    "productName": "HD 4D Racing Game",
+    "appId": "com.racerealm.game",
+    "productName": "RaceRealm",
     "directories": {
       "output": "dist"
     },

@@ -14,10 +14,13 @@ function createWindow() {
       webSecurity: false,
       allowRunningInsecureContent: true
     },
-    icon: path.join(__dirname, 'icon.png'),
+    icon: path.join(__dirname, '../client/public/favicon.ico'),
     show: false,
     titleBarStyle: 'default'
   });
+  mainWindow.setTitle('RaceRealm');
+  app.setName('RaceRealm');
+
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();

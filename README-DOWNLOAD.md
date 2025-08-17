@@ -1,10 +1,10 @@
-# HD 4D Racing Game - Standalone Download
+# RaceRealm - Standalone Download
 
 ## Download Instructions
 
 ### Windows
-1. Download `HD-4D-Racing-Game-Setup-x.x.x.exe` for installer
-2. Or download `HD-4D-Racing-Game-x.x.x.exe` for portable version
+1. Download `RaceRealm-Setup-x.x.x.exe` for installer
+2. Or download `RaceRealm-x.x.x.exe` for portable version
 3. Run the downloaded file and follow installation instructions
 4. Launch the game from desktop shortcut or start menu
 
