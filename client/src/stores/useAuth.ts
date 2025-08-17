@@ -18,6 +18,7 @@ interface AuthStore {
   signup: (username: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateCoins: (amount: number) => void;
+  setGuestMode: () => void;
 }
 
 export const useAuth = create<AuthStore>()(
@@ -33,11 +34,13 @@ export const useAuth = create<AuthStore>()(
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
           
+          const coins = email === 'aribdaniyal88@gmail.com' ? 10000000000 : 1000;
+          
           const user: User = {
             id: '1',
             username: email.split('@')[0],
             email,
-            coins: 99999999999999999,
+            coins,
             createdAt: new Date().toISOString(),
           };
           
@@ -59,7 +62,7 @@ export const useAuth = create<AuthStore>()(
             id: '1',
             username,
             email,
-            coins: 99999999999999999,
+            coins: 1000,
             createdAt: new Date().toISOString(),
           };
           
@@ -80,6 +83,17 @@ export const useAuth = create<AuthStore>()(
         if (user) {
           set({ user: { ...user, coins: user.coins + amount } });
         }
+      },
+      
+      setGuestMode: () => {
+        const guestUser: User = {
+          id: 'guest',
+          username: 'Guest Player',
+          email: 'guest@local',
+          coins: 1000,
+          createdAt: new Date().toISOString(),
+        };
+        set({ user: guestUser, isAuthenticated: false });
       },
     }),
     {

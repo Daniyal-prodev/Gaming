@@ -9,6 +9,7 @@ interface PaymentStore {
   cart: PurchaseItem[];
   isProcessing: boolean;
   
+  setCoins: (amount: number) => void;
   addCoins: (amount: number) => void;
   spendCoins: (amount: number) => boolean;
   addToCart: (item: PurchaseItem) => void;
@@ -25,11 +26,13 @@ interface PaymentStore {
 
 export const usePayment = create<PaymentStore>()(
   subscribeWithSelector((set, get) => ({
-    coins: 99999999999999999,
+    coins: 1000,
     ownedCars: [],
     ownedUpgrades: [],
     cart: [],
     isProcessing: false,
+    
+    setCoins: (amount) => set({ coins: amount }),
     
     addCoins: (amount) => set((state) => ({ coins: state.coins + amount })),
     
