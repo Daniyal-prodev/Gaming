@@ -13,7 +13,7 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const { login, signup, isLoading } = useAuth();
+  const { login, signup, isLoading, setGuestMode } = useAuth();
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [signupForm, setSignupForm] = useState({ username: '', email: '', password: '' });
 
@@ -144,7 +144,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           
           <Button 
             variant="ghost" 
-            onClick={onClose}
+            onClick={() => {
+              setGuestMode();
+              onClose();
+            }}
             className="w-full mt-4"
           >
             Continue as Guest
