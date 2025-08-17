@@ -13,9 +13,15 @@ import AuthModal from './AuthModal';
 export default function MainMenu() {
   const [, setLocation] = useLocation();
   const { setPhase } = useGame();
-  const { coins } = usePayment();
+  const { coins, setCoins } = usePayment();
   const { initializeAudio, playBackgroundMusic } = useAudio();
   const { user, isAuthenticated, logout } = useAuth();
+  
+  useEffect(() => {
+    if (user && user.coins !== coins) {
+      setCoins(user.coins);
+    }
+  }, [user, coins, setCoins]);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
