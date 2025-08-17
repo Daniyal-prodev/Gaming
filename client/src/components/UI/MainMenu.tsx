@@ -15,9 +15,20 @@ export default function MainMenu() {
   const { initializeAudio, playBackgroundMusic } = useAudio();
 
   useEffect(() => {
-    initializeAudio();
-    playBackgroundMusic();
-  }, [initializeAudio, playBackgroundMusic]);
+    const handleUserInteraction = async () => {
+      await initializeAudio();
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+    };
+
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('keydown', handleUserInteraction);
+
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+    };
+  }, [initializeAudio]);
 
   const startGame = () => {
     setPhase('loading');
@@ -73,7 +84,6 @@ export default function MainMenu() {
               <CardTitle className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
                 Multiplayer
-                <Badge variant="secondary">Coming Soon</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -81,7 +91,7 @@ export default function MainMenu() {
                 Race against players from around the world
               </p>
               <Button 
-                disabled
+                onClick={() => setLocation('/multiplayer')}
                 className="cyber-button w-full"
                 size="lg"
               >
@@ -95,7 +105,6 @@ export default function MainMenu() {
               <CardTitle className="flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-primary" />
                 Career Mode
-                <Badge variant="secondary">Coming Soon</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -103,7 +112,7 @@ export default function MainMenu() {
                 Progress through championships and unlock rewards
               </p>
               <Button 
-                disabled
+                onClick={() => setLocation('/career')}
                 className="cyber-button w-full"
                 size="lg"
               >
@@ -117,7 +126,6 @@ export default function MainMenu() {
               <CardTitle className="flex items-center gap-2">
                 <Car className="w-5 h-5 text-primary" />
                 Garage
-                <Badge variant="secondary">Coming Soon</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -125,7 +133,7 @@ export default function MainMenu() {
                 Customize and upgrade your vehicles
               </p>
               <Button 
-                disabled
+                onClick={() => setLocation('/garage')}
                 className="cyber-button w-full"
                 size="lg"
               >
@@ -160,7 +168,6 @@ export default function MainMenu() {
               <CardTitle className="flex items-center gap-2">
                 <Coins className="w-5 h-5 text-primary" />
                 Shop
-                <Badge variant="secondary">Coming Soon</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -168,7 +175,7 @@ export default function MainMenu() {
                 Purchase cars, upgrades, and cosmetics
               </p>
               <Button 
-                disabled
+                onClick={() => setLocation('/shop')}
                 className="cyber-button w-full"
                 size="lg"
               >

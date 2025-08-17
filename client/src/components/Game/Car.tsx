@@ -15,7 +15,7 @@ export default function Car() {
   const [, get] = useKeyboardControls();
   
   const chassisBodyRef = useRef<THREE.Mesh>(null);
-  const position = useRef([0, 2, 0]);
+  const position = useRef([0, 1, 0]);
   const rotation = useRef([0, 0, 0]);
   const velocity = useRef([0, 0, 0]);
   
@@ -26,11 +26,14 @@ export default function Car() {
   const [currentDamage, setCurrentDamage] = useState(0);
   const [isTrailBraking, setIsTrailBraking] = useState(false);
   const [racingLine, setRacingLine] = useState({ deviation: 0, optimal: true });
+  const [hybridBoost, setHybridBoost] = useState(100);
+  const [aeroDynamics, setAeroDynamics] = useState({ downforce: 0, drag: 0 });
   
-  const maxSpeed = 300;
-  const gearRatios = [0, 2.8, 1.8, 1.3, 1.0, 0.8, 0.6];
-  const optimalShiftRPM = 7500;
-  const redlineRPM = 8500;
+  const maxSpeed = 450; // 450 km/h top speed
+  const maxHorsepower = 1250;
+  const gearRatios = [0, 3.2, 2.1, 1.6, 1.2, 0.9, 0.7, 0.5]; // 7-speed transmission
+  const optimalShiftRPM = 8500;
+  const redlineRPM = 10000;
 
   useFrame((state, delta) => {
     const { forward, backward, leftward, rightward, brake } = get();
@@ -97,7 +100,7 @@ export default function Car() {
     velocity.current[2] *= brakeValue;
     
     velocity.current[0] += Math.sin(rotation.current[1]) * engineValue * tireGrip;
-    velocity.current[2] -= Math.cos(rotation.current[1]) * engineValue * tireGrip;
+    velocity.current[2] += Math.cos(rotation.current[1]) * engineValue * tireGrip;
     
     const slipAngle = steeringValue * Math.min(1, currentSpeed / 50);
     rotation.current[1] += slipAngle * tireGrip;
@@ -132,37 +135,162 @@ export default function Car() {
 
   return (
     <group>
+      {/* Main chassis - futuristic hypercar body */}
       <mesh ref={chassisBodyRef} castShadow receiveShadow>
-        <boxGeometry args={[2, 0.5, 4]} />
-        <meshStandardMaterial color="#00ffff" metalness={0.8} roughness={0.2} />
+        {/* Primary body */}
+        <boxGeometry args={[2.2, 0.4, 5]} />
+        <meshStandardMaterial 
+          color="#001a33" 
+          metalness={0.9} 
+          roughness={0.1}
+          emissive="#003366"
+          emissiveIntensity={0.2}
+        />
         
-        <mesh position={[0, 0.3, 1.5]} castShadow>
-          <boxGeometry args={[1.8, 0.8, 1]} />
-          <meshStandardMaterial color="#001122" transparent opacity={0.3} />
+        {/* Cockpit/cabin */}
+        <mesh position={[0, 0.4, 0.5]} castShadow>
+          <boxGeometry args={[1.6, 0.6, 2]} />
+          <meshStandardMaterial 
+            color="#000011" 
+            transparent 
+            opacity={0.2}
+            metalness={0.8}
+            roughness={0.1}
+          />
         </mesh>
         
-        <pointLight position={[0.8, 0, 2]} intensity={2} color="#00ffff" distance={10} />
-        <pointLight position={[-0.8, 0, 2]} intensity={2} color="#00ffff" distance={10} />
+        {/* Front nose cone */}
+        <mesh position={[0, 0, 2.8]} castShadow>
+          <coneGeometry args={[0.8, 1.2, 8]} />
+          <meshStandardMaterial 
+            color="#001a33" 
+            metalness={0.9} 
+            roughness={0.1}
+            emissive="#003366"
+            emissiveIntensity={0.3}
+          />
+        </mesh>
         
-        <pointLight position={[0.8, 0, -2]} intensity={1} color="#ff0000" distance={5} />
-        <pointLight position={[-0.8, 0, -2]} intensity={1} color="#ff0000" distance={5} />
+        {/* Rear wing */}
+        <mesh position={[0, 0.8, -2.5]} castShadow>
+          <boxGeometry args={[2.4, 0.1, 0.8]} />
+          <meshStandardMaterial 
+            color="#001a33" 
+            metalness={0.9} 
+            roughness={0.1}
+          />
+        </mesh>
+        
+        {/* Side air intakes */}
+        <mesh position={[1.2, 0.2, 0]} castShadow>
+          <boxGeometry args={[0.3, 0.4, 1.5]} />
+          <meshStandardMaterial color="#000000" />
+        </mesh>
+        <mesh position={[-1.2, 0.2, 0]} castShadow>
+          <boxGeometry args={[0.3, 0.4, 1.5]} />
+          <meshStandardMaterial color="#000000" />
+        </mesh>
+        
+        {/* Holographic HUD elements */}
+        <mesh position={[0, 0.9, 1]} castShadow>
+          <planeGeometry args={[0.8, 0.4]} />
+          <meshStandardMaterial 
+            color="#00ffff" 
+            transparent 
+            opacity={0.6}
+            emissive="#00ffff"
+            emissiveIntensity={0.8}
+          />
+        </mesh>
+        
+        {/* Front LED headlights */}
+        <pointLight position={[0.6, 0.2, 2.5]} intensity={3} color="#00ffff" distance={15} />
+        <pointLight position={[-0.6, 0.2, 2.5]} intensity={3} color="#00ffff" distance={15} />
+        
+        {/* Rear lights */}
+        <pointLight position={[0.6, 0.2, -2.5]} intensity={2} color="#ff0000" distance={8} />
+        <pointLight position={[-0.6, 0.2, -2.5]} intensity={2} color="#ff0000" distance={8} />
+        
+        {/* Underglow lighting */}
+        <pointLight position={[0, -0.3, 0]} intensity={1.5} color="#00ffff" distance={6} />
+        
+        {/* Exhaust glow */}
+        <mesh position={[0.4, -0.1, -2.8]} castShadow>
+          <cylinderGeometry args={[0.15, 0.15, 0.3]} />
+          <meshStandardMaterial 
+            color="#ff4400" 
+            emissive="#ff4400"
+            emissiveIntensity={0.8}
+          />
+        </mesh>
+        <mesh position={[-0.4, -0.1, -2.8]} castShadow>
+          <cylinderGeometry args={[0.15, 0.15, 0.3]} />
+          <meshStandardMaterial 
+            color="#ff4400" 
+            emissive="#ff4400"
+            emissiveIntensity={0.8}
+          />
+        </mesh>
       </mesh>
 
-      <mesh position={[-1, 1.5, 1.3]} castShadow>
-        <cylinderGeometry args={[0.4, 0.4, 0.2, 16]} />
-        <meshStandardMaterial color="#333333" />
+      {/* High-performance wheels */}
+      <mesh position={[-1.1, 0.3, 1.8]} castShadow rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.45, 0.45, 0.25, 16]} />
+        <meshStandardMaterial color="#111111" metalness={0.8} roughness={0.2} />
       </mesh>
-      <mesh position={[1, 1.5, 1.3]} castShadow>
-        <cylinderGeometry args={[0.4, 0.4, 0.2, 16]} />
-        <meshStandardMaterial color="#333333" />
+      <mesh position={[1.1, 0.3, 1.8]} castShadow rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.45, 0.45, 0.25, 16]} />
+        <meshStandardMaterial color="#111111" metalness={0.8} roughness={0.2} />
       </mesh>
-      <mesh position={[-1, 1.5, -1.3]} castShadow>
-        <cylinderGeometry args={[0.4, 0.4, 0.2, 16]} />
-        <meshStandardMaterial color="#333333" />
+      <mesh position={[-1.1, 0.3, -1.8]} castShadow rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.45, 0.45, 0.25, 16]} />
+        <meshStandardMaterial color="#111111" metalness={0.8} roughness={0.2} />
       </mesh>
-      <mesh position={[1, 1.5, -1.3]} castShadow>
-        <cylinderGeometry args={[0.4, 0.4, 0.2, 16]} />
-        <meshStandardMaterial color="#333333" />
+      <mesh position={[1.1, 0.3, -1.8]} castShadow rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.45, 0.45, 0.25, 16]} />
+        <meshStandardMaterial color="#111111" metalness={0.8} roughness={0.2} />
+      </mesh>
+      
+      {/* Wheel rims with glow */}
+      <mesh position={[-1.1, 0.3, 1.8]} castShadow rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.25, 0.25, 0.3, 8]} />
+        <meshStandardMaterial 
+          color="#00ffff" 
+          metalness={0.9} 
+          roughness={0.1}
+          emissive="#00ffff"
+          emissiveIntensity={0.4}
+        />
+      </mesh>
+      <mesh position={[1.1, 0.3, 1.8]} castShadow rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.25, 0.25, 0.3, 8]} />
+        <meshStandardMaterial 
+          color="#00ffff" 
+          metalness={0.9} 
+          roughness={0.1}
+          emissive="#00ffff"
+          emissiveIntensity={0.4}
+        />
+      </mesh>
+      <mesh position={[-1.1, 0.3, -1.8]} castShadow rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.25, 0.25, 0.3, 8]} />
+        <meshStandardMaterial 
+          color="#00ffff" 
+          metalness={0.9} 
+          roughness={0.1}
+          emissive="#00ffff"
+          emissiveIntensity={0.4}
+        />
+      </mesh>
+      <mesh position={[1.1, 0.3, -1.8]} castShadow rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.25, 0.25, 0.3, 8]} />
+        <meshStandardMaterial 
+          color="#00ffff" 
+          metalness={0.9} 
+          roughness={0.1}
+          emissive="#00ffff"
+          emissiveIntensity={0.4}
+        />
       </mesh>
     </group>
   );

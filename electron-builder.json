@@ -1,6 +1,6 @@
 {
   "appId": "com.gaming.racing3d",
-  "productName": "3D Racing Game",
+  "productName": "GameHub Racing",
   "directories": {
     "output": "dist-electron"
   },
@@ -10,20 +10,12 @@
     "package.json"
   ],
   "win": {
-    "target": "nsis",
-    "icon": "electron/icon.ico"
+    "target": "nsis"
   },
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true
-  },
-  "extraResources": [
-    {
-      "from": "dist/public",
-      "to": "app",
-      "filter": ["**/*"]
-    }
-  ]
+  }
 }
