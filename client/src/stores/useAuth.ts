@@ -93,7 +93,7 @@ export const useAuth = create<AuthStore>()(
           coins: 1000,
           createdAt: new Date().toISOString(),
         };
-        set({ user: guestUser, isAuthenticated: false });
+        set({ user: guestUser, isAuthenticated: true });
       },
     }),
     {

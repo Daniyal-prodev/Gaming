@@ -39,7 +39,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
       <Card className="cyber-panel w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center text-primary">Welcome to GameHub</CardTitle>
+          <CardTitle className="text-center text-primary">Welcome to RaceRealm</CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">

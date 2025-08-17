@@ -1,6 +1,10 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
-const isDev = process.env.NODE_ENV === 'development';
+import { app, BrowserWindow, shell } from 'electron';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const isDev = !app.isPackaged;
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -18,9 +22,9 @@ function createWindow() {
     show: false,
     titleBarStyle: 'default'
   });
+
   mainWindow.setTitle('RaceRealm');
   app.setName('RaceRealm');
-
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
@@ -39,7 +43,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow();
-  
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
@@ -53,9 +57,9 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('web-contents-created', (event, contents) => {
+app.on('web-contents-created', (_event, contents) => {
   contents.on('new-window', (event, navigationUrl) => {
     event.preventDefault();
-    require('electron').shell.openExternal(navigationUrl);
+    shell.openExternal(navigationUrl);
   });
 });
