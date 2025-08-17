@@ -43,17 +43,52 @@ export default function Track() {
         <meshStandardMaterial color="#ff0000" transparent opacity={0.3} />
       </mesh>
 
-      {Array.from({ length: 20 }, (_, i) => {
-        const angle = (i / 20) * Math.PI * 2;
+      {/* Racing line markers - optimal path */}
+      {Array.from({ length: 40 }, (_, i) => {
+        const angle = (i / 40) * Math.PI * 2;
         const x = Math.cos(angle) * 20;
         const z = Math.sin(angle) * 20;
         return (
-          <mesh key={i} position={[x, 0.1, z]}>
+          <mesh key={`racing-line-${i}`} position={[x, 0.05, z]}>
+            <cylinderGeometry args={[0.1, 0.1, 0.2]} />
+            <meshStandardMaterial 
+              color="#00ff00" 
+              emissive="#00ff00" 
+              emissiveIntensity={0.5}
+            />
+          </mesh>
+        );
+      })}
+      
+      {/* Apex markers for corners */}
+      {Array.from({ length: 8 }, (_, i) => {
+        const angle = (i / 8) * Math.PI * 2;
+        const x = Math.cos(angle) * 18;
+        const z = Math.sin(angle) * 18;
+        return (
+          <mesh key={`apex-${i}`} position={[x, 0.1, z]}>
+            <coneGeometry args={[0.3, 1, 6]} />
+            <meshStandardMaterial 
+              color="#ffff00" 
+              emissive="#ffff00" 
+              emissiveIntensity={0.7}
+            />
+          </mesh>
+        );
+      })}
+      
+      {/* Braking zone markers */}
+      {Array.from({ length: 20 }, (_, i) => {
+        const angle = (i / 20) * Math.PI * 2;
+        const x = Math.cos(angle) * 25;
+        const z = Math.sin(angle) * 25;
+        return (
+          <mesh key={`brake-${i}`} position={[x, 0.1, z]}>
             <cylinderGeometry args={[0.2, 0.2, 2]} />
             <meshStandardMaterial 
-              color="#00ffff" 
-              emissive="#00ffff" 
-              emissiveIntensity={0.3}
+              color="#ff0000" 
+              emissive="#ff0000" 
+              emissiveIntensity={0.4}
             />
           </mesh>
         );
